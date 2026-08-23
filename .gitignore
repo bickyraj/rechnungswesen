@@ -1,0 +1,106 @@
+# =========================
+# Gradle
+# =========================
+.gradle/
+build/
+**/build/
+**/out/
+
+# Keep Gradle wrapper files
+!gradle/wrapper/gradle-wrapper.jar
+
+# Keep source build directories if needed
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+
+# =========================
+# Spring Boot
+# =========================
+*.jar
+*.war
+*.ear
+target/
+
+# Re-include Gradle wrapper jar after jar ignore rules
+!gradle/wrapper/gradle-wrapper.jar
+
+
+# =========================
+# IntelliJ IDEA
+# =========================
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+!.idea/runConfigurations/
+
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+
+
+# =========================
+# macOS
+# =========================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+
+# =========================
+# Environment / Secrets
+# =========================
+.env
+.env.*
+*.env
+
+application-local.yml
+application-local.properties
+application-secret.yml
+*-secret.yml
+
+
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+
+
+# =========================
+# Java
+# =========================
+*.class
+
+# BlueJ files
+*.ctxt
+
+# Java temporary files
+.mtj.tmp/
+
+
+# =========================
+# Archives
+# =========================
+*.zip
+*.tar.gz
+*.rar
+*.nar
+
+
+# =========================
+# JVM Crash Logs
+# =========================
+hs_err_pid*
+replay_pid*
+
+
+# =========================
+# Application uploads
+# =========================
+uploads/

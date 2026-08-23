@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: rechnungswesen-postgres
+    environment:
+      POSTGRES_USER: rechnungswesen
+      POSTGRES_PASSWORD: rechnungswesen
+      POSTGRES_DB : rechnungswesen
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-keycloak-db.sql:/docker-entrypoint-initdb.d/init-keycloak-db.sql
+    networks:
+      - rechnungswesen-net
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.6
+    container_name: rechnungswesen-keycloak
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak_db
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+#      KC_HTTP_ENABLED: true
+#      KC_PROXY_HEADERS: xforwarded
+#      KC_HOSTNAME: https://candyhms.duckdns.org/auth
+#      KC_HOSTNAME_STRICT: false
+    ports:
+      - "8082:8080"
+    depends_on:
+      - postgres
+    networks:
+      - rechnungswesen-net
+volumes:
+  postgres_data:
+
+networks:
+  rechnungswesen-net:
+    external: true
+
