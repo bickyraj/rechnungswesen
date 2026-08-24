@@ -36,4 +36,22 @@ public class PostgreSqlAccountRepository implements AccountRepository {
 		accountModel.setCustomer(customerModel);
 		jpaAccountRepository.save(accountModel);
 	}
+
+	@Override
+	public void updateBalance(Account account) {
+		AccountModel accountModel =
+				jpaAccountRepository.findById(account.getId())
+						.orElseThrow(() ->
+								new IllegalArgumentException("Account not found"));
+
+		accountModel.setBalance(account.getBalance());
+
+		jpaAccountRepository.save(accountModel);
+	}
+
+	@Override
+	public Optional<Account> getByIdForUpdate(Long id) {
+		return jpaAccountRepository.findByIdForUpdate(id)
+				.map(accountModel -> modelMapper.map(accountModel, Account.class));
+	}
 }
