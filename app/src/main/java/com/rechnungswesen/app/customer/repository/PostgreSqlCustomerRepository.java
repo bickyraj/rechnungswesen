@@ -24,6 +24,7 @@ public class PostgreSqlCustomerRepository implements CustomerRepository {
 
 	@Override
 	public Optional<Customer> getById(Long id) {
-		return Optional.empty();
+		return jpaCustomerRepository.findById(id)
+				.map(customerModel -> modelMapper.map(customerModel, Customer.class));
 	}
 }

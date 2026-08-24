@@ -1,0 +1,89 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-account
+      author: backend
+
+      changes:
+
+        - createTable:
+            tableName: accounts
+            columns:
+
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: customer_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: currency
+                  type: CHAR(3)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: balance
+                  type: NUMERIC(19,4)
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  defaultValue: ACTIVE
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: version
+                  type: BIGINT
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueDate: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueDate: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: accounts
+            baseColumnNames: customer_id
+            referencedTableName: customers
+            referencedColumnNames: id
+            constraintName: fk_accounts_customers
+
+        - addUniqueConstraint:
+            tableName: accounts
+            columnNames: customer_id, currency
+            constraintName: uk_accounts_customers_currency
+
+        - sql:
+            sql: >
+              ALTER TABLE accounts
+              ADD CONSTRAINT account_status_check
+              CHECK (status IN ('ACTIVE', 'BLOCKED', 'CLOSED'));
+
+        - sql:
+            sql: >
+              ALTER TABLE accounts
+              ADD CONSTRAINT account_balance_non_negative
+              CHECK (balance >= 0);
