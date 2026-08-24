@@ -1,0 +1,81 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 004-create-ledger-entry
+      author: backend
+
+      changes:
+
+        - createTable:
+            tableName: ledger_entries
+            columns:
+
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: payment_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: account_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: entry_type
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: amount
+                  type: NUMERIC(19,4)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: currency
+                  type: CHAR(3)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueDate: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: ledger_entries
+            baseColumnNames: payment_id
+            referencedTableName: payments
+            referencedColumnNames: id
+            constraintName: fk_ledger_entry_payment
+
+        - addForeignKeyConstraint:
+            baseTableName: ledger_entries
+            baseColumnNames: account_id
+            referencedTableName: accounts
+            referencedColumnNames: id
+            constraintName: fk_ledger_entry_account
+
+        - sql:
+            sql: >
+              ALTER TABLE ledger_entries
+              ADD CONSTRAINT ledger_entry_type_check
+              CHECK (entry_type IN ('DEBIT', 'CREDIT'));
+
+        - sql:
+            sql: >
+              ALTER TABLE ledger_entries
+              ADD CONSTRAINT ledger_entry_amount_positive
+              CHECK (amount > 0);

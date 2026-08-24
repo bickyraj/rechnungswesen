@@ -3,3 +3,7 @@ databaseChangeLog:
       file: db/changelog/create-customer-table.yaml
   - include:
       file: db/changelog/create-account-table.yaml
+  - include:
+      file: db/changelog/create-payment-table.yaml
+  - include:
+      file: db/changelog/create-ledger-table.yaml
