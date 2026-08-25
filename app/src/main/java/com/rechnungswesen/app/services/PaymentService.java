@@ -3,17 +3,23 @@ package com.rechnungswesen.app.services;
 import java.math.BigDecimal;
 import java.time.Instant;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rechnungswesen.app.account.entity.Account;
 import com.rechnungswesen.app.account.repository.AccountRepository;
 import com.rechnungswesen.app.common.constants.LedgerEntryType;
 import com.rechnungswesen.app.common.constants.PaymentStatus;
 import com.rechnungswesen.app.customer.repository.LedgerEntryRepository;
+import com.rechnungswesen.app.outbox.entity.OutboxEvent;
+import com.rechnungswesen.app.outbox.entity.PaymentCompletedEvent;
+import com.rechnungswesen.app.outbox.repository.OutboxRepository;
 import com.rechnungswesen.app.payment.entity.LedgerEntry;
 import com.rechnungswesen.app.payment.entity.Payment;
 import com.rechnungswesen.app.payment.repository.PaymentRepository;
 import com.rechnungswesen.app.valueobject.IdempotencyKey;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 
 import org.springframework.stereotype.Service;
 
@@ -24,6 +30,9 @@ public class PaymentService {
 	private final PaymentRepository paymentRepository;
 	private final AccountRepository accountRepository;
 	private final LedgerEntryRepository ledgerEntryRepository;
+	private final OutboxRepository outboxRepository;
+	private final ModelMapper modelMapper;
+	private final ObjectMapper objectMapper;
 
 	@Transactional
 	public void paymentTransfer(
@@ -111,5 +120,33 @@ public class PaymentService {
 		savedPayment.setStatus(PaymentStatus.COMPLETED);
 		savedPayment.setCompletedAt(Instant.now());
 		paymentRepository.savePayment(savedPayment);
+
+		// NEW: create outbox event
+		PaymentCompletedEvent eventPayload =
+				new PaymentCompletedEvent(
+						savedPayment.getId(),
+						sourceAccount.getId(),
+						destinationAccount.getId(),
+						savedPayment.getAmount(),
+						savedPayment.getCurrency(),
+						savedPayment.getCompletedAt()
+				);
+
+		String payload;
+		try {
+			payload = objectMapper.writeValueAsString(eventPayload);
+		} catch (JsonProcessingException e) {
+			throw new IllegalStateException(
+					"Failed to serialize payment event", e
+			);
+		}
+		OutboxEvent event = OutboxEvent.builder()
+				.eventType("PAYMENT_COMPLETED")
+				.aggregateId(savedPayment.getId())
+				.payload(payload)
+				.createdAt(Instant.now())
+				.build();
+
+		outboxRepository.save(event);
 	}
 }

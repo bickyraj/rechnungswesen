@@ -7,3 +7,5 @@ databaseChangeLog:
       file: db/changelog/create-payment-table.yaml
   - include:
       file: db/changelog/create-ledger-table.yaml
+  - include:
+      file: db/changelog/create-outbox-event-table.yaml

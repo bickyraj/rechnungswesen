@@ -39,6 +39,7 @@ subprojects {
         implementation 'org.springframework.boot:spring-boot-starter-security'
         implementation 'org.keycloak:keycloak-admin-client:26.0.9'
         implementation 'org.modelmapper:modelmapper'
+        implementation 'org.springframework.kafka:spring-kafka'
         testCompileOnly 'org.projectlombok:lombok'
         testAnnotationProcessor 'org.projectlombok:lombok'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
