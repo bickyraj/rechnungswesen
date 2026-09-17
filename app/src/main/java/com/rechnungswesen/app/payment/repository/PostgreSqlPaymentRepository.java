@@ -45,7 +45,16 @@ public class PostgreSqlPaymentRepository implements PaymentRepository {
 
 	@Override
 	public Optional<Payment> findByIdempotencyKey(IdempotencyKey idempotencyKey) {
-		return jpaPaymentRepository.findByIdempotencyKey(idempotencyKey.getValue())
-				.map(paymentModel -> modelMapper.map(paymentModel, Payment.class));
+		return jpaPaymentRepository
+				.findByIdempotencyKey(idempotencyKey.getValue())
+				.map(paymentModel -> Payment.builder()
+						.id(paymentModel.getId())
+						.amount(paymentModel.getAmount())
+						.currency(paymentModel.getCurrency())
+						.status(paymentModel.getStatus())
+						.idempotencyKey(IdempotencyKey.of(paymentModel.getIdempotencyKey()))
+						.createdAt(paymentModel.getCreatedAt())
+						.completedAt(paymentModel.getCompletedAt())
+						.build());
 	}
 }

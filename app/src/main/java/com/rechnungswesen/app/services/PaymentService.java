@@ -56,7 +56,7 @@ public class PaymentService {
 		}
 
 		if (paymentRepository.findByIdempotencyKey(idempotencyKey).isPresent()) {
-			return;
+			throw new IllegalArgumentException("Idempotency key already exist");
 		}
 
 		Account sourceAccount = accountRepository.getByIdForUpdate(sourceAccountId)
