@@ -23,4 +23,11 @@ public class GlobalExceptionHandler {
 				ApiResponse.builder().message(ex.getMessage()).build()
 		);
 	}
+
+	@ExceptionHandler(IllegalStateException.class)
+	public ResponseEntity<ApiResponse> handleIllegalStateException(IllegalStateException ex) {
+		return ResponseEntity.status(400).body(
+				ApiResponse.builder().message(ex.getMessage()).build()
+		);
+	}
 }
