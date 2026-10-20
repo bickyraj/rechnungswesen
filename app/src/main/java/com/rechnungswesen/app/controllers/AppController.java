@@ -44,7 +44,6 @@ public class AppController {
 					System.out.println("finished free public job.");
 				});
 
-		CompletableFuture.allOf(futureA, futureA).join();
 		ArbeitNowResponse responseA = futureA.join();
 		List<FreeApiResponse> responseB = futureB.join();
 
