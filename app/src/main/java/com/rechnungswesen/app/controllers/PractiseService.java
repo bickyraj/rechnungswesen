@@ -28,7 +28,7 @@ public class PractiseService {
 	@Observed(name = "api.fetch")
 	public ArbeitNowResponse getArbeitNowJobList() {
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(20000);
 		}
 		catch (InterruptedException e) {
 			throw new RuntimeException(e);
@@ -41,7 +41,7 @@ public class PractiseService {
 
 	public List<FreeApiResponse> getFreePublicApi() {
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(20000);
 		}
 		catch (InterruptedException e) {
 			throw new RuntimeException(e);
