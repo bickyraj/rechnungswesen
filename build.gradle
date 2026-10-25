@@ -44,6 +44,11 @@ subprojects {
         testAnnotationProcessor 'org.projectlombok:lombok'
         testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+        implementation 'org.springframework.boot:spring-boot-starter-actuator'
+        implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+        runtimeOnly 'io.opentelemetry:opentelemetry-exporter-zipkin'
+        implementation 'org.springframework.boot:spring-boot-starter-aop'
+
         runtimeOnly 'org.postgresql:postgresql'
     }
 

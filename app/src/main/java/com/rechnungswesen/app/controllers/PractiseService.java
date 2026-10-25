@@ -6,6 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.rechnungswesen.app.controllers.response.ArbeitNowResponse;
 import com.rechnungswesen.app.controllers.response.FreeApiResponse;
+import io.micrometer.observation.annotation.Observed;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
@@ -24,9 +25,10 @@ public class PractiseService {
 		counter = 0L;
 	}
 
+	@Observed(name = "api.fetch")
 	public ArbeitNowResponse getArbeitNowJobList() {
 		try {
-			Thread.sleep(20000);
+			Thread.sleep(2000);
 		}
 		catch (InterruptedException e) {
 			throw new RuntimeException(e);
@@ -39,7 +41,7 @@ public class PractiseService {
 
 	public List<FreeApiResponse> getFreePublicApi() {
 		try {
-			Thread.sleep(20000);
+			Thread.sleep(2000);
 		}
 		catch (InterruptedException e) {
 			throw new RuntimeException(e);
