@@ -8,6 +8,10 @@ import java.util.concurrent.ExecutorService;
 
 import com.rechnungswesen.app.controllers.response.ArbeitNowResponse;
 import com.rechnungswesen.app.controllers.response.FreeApiResponse;
+import com.rechnungswesen.app.xmlprocessor.JsonData;
+import com.rechnungswesen.app.xmlprocessor.JsonToXmlAdaptor;
+import com.rechnungswesen.app.xmlprocessor.XmlProcessor;
+import com.rechnungswesen.app.xmlprocessor.XmlProcessorService;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -24,6 +28,7 @@ public class AppController {
 
 	private final PractiseService practiseService;
 	private final ExecutorService executorService;
+	private final XmlProcessorService xmlProcessorService;
 
 	@GetMapping("/home")
 	public ResponseEntity<Map<String, Object>> home() {
@@ -52,5 +57,11 @@ public class AppController {
 		response.put("freePublicApi", responseB);
 
 		return ResponseEntity.ok(response);
+	}
+
+	public ResponseEntity<Boolean> downloadXml(JsonData jsonData) {
+		XmlProcessor xmlProcessor = new JsonToXmlAdaptor(jsonData);
+		xmlProcessorService.download(xmlProcessor);
+		return ResponseEntity.ok(true);
 	}
 }
