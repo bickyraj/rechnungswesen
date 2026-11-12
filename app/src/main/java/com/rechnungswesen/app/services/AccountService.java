@@ -6,7 +6,6 @@ import com.rechnungswesen.app.account.entity.Account;
 import com.rechnungswesen.app.account.repository.AccountRepository;
 import com.rechnungswesen.app.common.constants.AccountStatus;
 import com.rechnungswesen.app.customer.entity.Customer;
-import com.rechnungswesen.app.customer.repository.CustomerRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 public class AccountService {
 
 	private final AccountRepository accountRepository;
-	private final CustomerRepository customerRepository;
 
 	@Transactional
 	public void createAccount(Long customerId, String currency) {

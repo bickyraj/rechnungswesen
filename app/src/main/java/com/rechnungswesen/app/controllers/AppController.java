@@ -59,6 +59,11 @@ public class AppController {
 		return ResponseEntity.ok(response);
 	}
 
+	@GetMapping("/test-n8n")
+	public ResponseEntity<Boolean> testn8n() {
+		throw new IllegalStateException("not working");
+	}
+
 	public ResponseEntity<Boolean> downloadXml(JsonData jsonData) {
 		XmlProcessor xmlProcessor = new JsonToXmlAdaptor(jsonData);
 		xmlProcessorService.download(xmlProcessor);
