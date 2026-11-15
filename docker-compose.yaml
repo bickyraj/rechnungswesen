@@ -80,8 +80,49 @@ services:
     restart: unless-stopped
     networks:
       - rechnungswesen-net
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.5.6
+    container_name: rechnungswesen-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "127.0.0.1:9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - rechnungswesen-net
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:9.5.6
+    container_name: rechnungswesen-kibana
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOSTS=["http://elasticsearch:9200"]
+      - XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY=2de719f9d390738d05e829e33120b2be65a73b5ee8184f2bcb0d3b6d1ab4cae0
+    ports:
+      - "127.0.0.1:5601:5601"
+    networks:
+      - rechnungswesen-net
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:9.5.6
+    container_name: rechnungswesen-logstash
+    depends_on:
+      - elasticsearch
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+    networks:
+      - rechnungswesen-net
+
 volumes:
   postgres_data:
+  elasticsearch_data:
 
 networks:
   rechnungswesen-net:

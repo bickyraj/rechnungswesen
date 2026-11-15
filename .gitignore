@@ -104,3 +104,5 @@ replay_pid*
 # Application uploads
 # =========================
 uploads/
+
+gradle.properties

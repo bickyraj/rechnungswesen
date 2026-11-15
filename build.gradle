@@ -2,6 +2,8 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.15' apply false
     id 'io.spring.dependency-management' version '1.1.7' apply false
+    id 'org.owasp.dependencycheck' version '13.0.0'
+    id 'org.cyclonedx.bom' version '3.6.1'
 }
 
 group = 'com.rechnungswesen'
@@ -48,11 +50,68 @@ subprojects {
         implementation 'io.micrometer:micrometer-tracing-bridge-otel'
         runtimeOnly 'io.opentelemetry:opentelemetry-exporter-zipkin'
         implementation 'org.springframework.boot:spring-boot-starter-aop'
+        // Sends structured JSON logs to Logstash
+        implementation 'net.logstash.logback:logstash-logback-encoder:8.1'
 
         runtimeOnly 'org.postgresql:postgresql'
     }
 
     tasks.withType(Test).configureEach {
         useJUnitPlatform()
+    }
+}
+dependencyCheck {
+    nvd {
+        datafeedUrl = 'https://dependency-check.github.io/DependencyCheck_Builder/nvd_cache/nvdcve-{0}.json.gz'
+//        apiKey = System.getenv('NVD_API_KEY')
+    }
+}
+tasks.named('check') {
+    dependsOn 'dependencyCheckAggregate'
+}
+
+tasks.register('bom') {
+    group = 'verification'
+    description = 'Generates the CycloneDX SBOM.'
+    dependsOn 'cyclonedxBom'
+}
+
+// Upload SBOM to Dependency-Track
+tasks.register('uploadBom', Exec) {
+    group = 'verification'
+    description = 'Generates and uploads SBOM to Dependency-Track.'
+
+    dependsOn 'bom'
+
+    doFirst {
+        def apiKey = System.getenv('DT_API_KEY') ?:
+                providers.gradleProperty('DT_API_KEY').orNull
+
+        if (!apiKey) {
+            throw new GradleException(
+                    'DT_API_KEY is missing. Configure it as an environment variable or Gradle property.'
+            )
+        }
+
+        def bomFile = layout.buildDirectory
+                .file('reports/cyclonedx/bom.json')
+                .get().asFile
+
+        if (!bomFile.exists()) {
+            throw new GradleException(
+                    "SBOM file not found: ${bomFile}"
+            )
+        }
+
+        commandLine 'curl',
+                '--fail-with-body',
+                '--silent',
+                '--show-error',
+                '--request', 'POST',
+                'http://localhost:8080/api/v1/bom',
+                '--header', "X-Api-Key: ${apiKey}",
+                '--form', 'projectName=rechnungswesen',
+                '--form', "projectVersion=${rootProject.version}",
+                '--form', "bom=@${bomFile.absolutePath}"
     }
 }

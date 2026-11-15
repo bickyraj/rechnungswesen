@@ -53,3 +53,5 @@ logging:
     org.springframework.web: DEBUG
   file:
     name: logs/banking-api.log
+n8n:
+  url: https://b840-5-42-207-9.ngrok-free.app/webhook/springboot-error
