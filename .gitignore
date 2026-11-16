@@ -106,3 +106,5 @@ replay_pid*
 uploads/
 
 gradle.properties
+
+/agent
