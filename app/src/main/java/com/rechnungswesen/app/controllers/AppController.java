@@ -8,6 +8,11 @@ import java.util.concurrent.ExecutorService;
 
 import com.rechnungswesen.app.controllers.response.ArbeitNowResponse;
 import com.rechnungswesen.app.controllers.response.FreeApiResponse;
+import com.rechnungswesen.app.pizza.Pizza;
+import com.rechnungswesen.app.pizza.PizzaDTO;
+import com.rechnungswesen.app.pizza.PlainPizza;
+import com.rechnungswesen.app.pizza.pizzadecorator.ChickenPizzaDecorator;
+import com.rechnungswesen.app.pizza.pizzadecorator.MushroomPizzaDecorator;
 import com.rechnungswesen.app.xmlprocessor.JsonData;
 import com.rechnungswesen.app.xmlprocessor.JsonToXmlAdaptor;
 import com.rechnungswesen.app.xmlprocessor.XmlProcessor;
@@ -68,5 +73,19 @@ public class AppController {
 		XmlProcessor xmlProcessor = new JsonToXmlAdaptor(jsonData);
 		xmlProcessorService.download(xmlProcessor);
 		return ResponseEntity.ok(true);
+	}
+
+	@GetMapping("/pizza")
+	public ResponseEntity<PizzaDTO> pizza() {
+		Pizza pizza = new PlainPizza();
+		pizza = new ChickenPizzaDecorator(pizza);
+		pizza = new MushroomPizzaDecorator(pizza);
+
+		PizzaDTO pizzaDTO = PizzaDTO.builder()
+				.name(pizza.getName())
+				.price(pizza.getPrice())
+				.ingredients(pizza.getIngredients())
+				.build();
+		return ResponseEntity.ok(pizzaDTO);
 	}
 }
