@@ -1,5 +1,6 @@
 package com.rechnungswesen.app.controllers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,9 +11,11 @@ import com.rechnungswesen.app.controllers.response.ArbeitNowResponse;
 import com.rechnungswesen.app.controllers.response.FreeApiResponse;
 import com.rechnungswesen.app.pizza.Pizza;
 import com.rechnungswesen.app.pizza.PizzaDTO;
+import com.rechnungswesen.app.pizza.PizzaService;
 import com.rechnungswesen.app.pizza.PlainPizza;
 import com.rechnungswesen.app.pizza.pizzadecorator.ChickenPizzaDecorator;
 import com.rechnungswesen.app.pizza.pizzadecorator.MushroomPizzaDecorator;
+import com.rechnungswesen.app.pizza.pizzadecorator.OlivePizzaDecorator;
 import com.rechnungswesen.app.xmlprocessor.JsonData;
 import com.rechnungswesen.app.xmlprocessor.JsonToXmlAdaptor;
 import com.rechnungswesen.app.xmlprocessor.XmlProcessor;
@@ -34,6 +37,7 @@ public class AppController {
 	private final PractiseService practiseService;
 	private final ExecutorService executorService;
 	private final XmlProcessorService xmlProcessorService;
+	private final PizzaService pizzaService;
 
 	@GetMapping("/home")
 	public ResponseEntity<Map<String, Object>> home() {
@@ -76,16 +80,21 @@ public class AppController {
 	}
 
 	@GetMapping("/pizza")
-	public ResponseEntity<PizzaDTO> pizza() {
-		Pizza pizza = new PlainPizza();
-		pizza = new ChickenPizzaDecorator(pizza);
-		pizza = new MushroomPizzaDecorator(pizza);
+	public ResponseEntity<List<PizzaDTO>> pizza() {
+		Pizza plainPizza = new PlainPizza();
+		Pizza chickenPizzaDecorator = new ChickenPizzaDecorator(plainPizza);
+		Pizza mushroomPizzaDecorator = new MushroomPizzaDecorator(plainPizza);
+		Pizza mushroomChickenPizza = new MushroomPizzaDecorator(chickenPizzaDecorator);
+		Pizza oliveMushroomPizza = new OlivePizzaDecorator(mushroomPizzaDecorator);
+		Pizza mixedPizza = new OlivePizzaDecorator(mushroomChickenPizza);
+		ArrayList<PizzaDTO> pizzas = new ArrayList<>();
+		pizzas.add(pizzaService.bakePizza(plainPizza));
+		pizzas.add(pizzaService.bakePizza(chickenPizzaDecorator));
+		pizzas.add(pizzaService.bakePizza(mushroomPizzaDecorator));
+		pizzas.add(pizzaService.bakePizza(mushroomChickenPizza));
+		pizzas.add(pizzaService.bakePizza(oliveMushroomPizza));
+		pizzas.add(pizzaService.bakePizza(mixedPizza));
 
-		PizzaDTO pizzaDTO = PizzaDTO.builder()
-				.name(pizza.getName())
-				.price(pizza.getPrice())
-				.ingredients(pizza.getIngredients())
-				.build();
-		return ResponseEntity.ok(pizzaDTO);
+		return ResponseEntity.ok(pizzas);
 	}
 }

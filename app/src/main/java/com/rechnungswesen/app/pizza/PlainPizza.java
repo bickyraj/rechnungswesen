@@ -11,7 +11,7 @@ public class PlainPizza extends BasePizza {
 
 	@Override
 	public Double getPrice() {
-		return 0.0;
+		return 100.0;
 	}
 
 	@Override
