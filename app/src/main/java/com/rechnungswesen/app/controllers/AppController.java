@@ -9,6 +9,8 @@ import java.util.concurrent.ExecutorService;
 
 import com.rechnungswesen.app.controllers.response.ArbeitNowResponse;
 import com.rechnungswesen.app.controllers.response.FreeApiResponse;
+import com.rechnungswesen.app.discount.DiscountService;
+import com.rechnungswesen.app.discount.DiscountStrategyEnum;
 import com.rechnungswesen.app.pizza.Pizza;
 import com.rechnungswesen.app.pizza.PizzaDTO;
 import com.rechnungswesen.app.pizza.PizzaService;
@@ -22,10 +24,13 @@ import com.rechnungswesen.app.xmlprocessor.XmlProcessor;
 import com.rechnungswesen.app.xmlprocessor.XmlProcessorService;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -38,6 +43,7 @@ public class AppController {
 	private final ExecutorService executorService;
 	private final XmlProcessorService xmlProcessorService;
 	private final PizzaService pizzaService;
+	private final DiscountService discountService;
 
 	@GetMapping("/home")
 	public ResponseEntity<Map<String, Object>> home() {
@@ -96,5 +102,15 @@ public class AppController {
 		pizzas.add(pizzaService.bakePizza(mixedPizza));
 
 		return ResponseEntity.ok(pizzas);
+	}
+
+	@GetMapping("/discount")
+	public ResponseEntity<Double> getDiscount(
+			@RequestParam Double price,
+			@RequestParam DiscountStrategyEnum strategy) {
+
+		Double finalPrice = discountService.calcFinalPrice(price, strategy);
+
+		return ResponseEntity.ok(finalPrice);
 	}
 }
